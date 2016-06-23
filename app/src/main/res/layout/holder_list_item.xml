@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/holder_list_item_background">
+
+    <TextView
+        android:id="@+id/holder_list_item_title"
+        style="@android:style/TextAppearance.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:gravity="center"
+        tools:text="Test text"
+        android:layout_marginLeft="@dimen/holder_list_item_margin"
+        android:layout_marginRight="@dimen/holder_list_item_margin"
+        android:layout_alignBottom="@+id/holder_list_item_progress"
+        android:layout_alignTop="@+id/holder_list_item_progress"/>
+
+    <ProgressBar
+        android:id="@+id/holder_list_item_progress"
+        android:layout_width="@dimen/holder_list_item_block_size"
+        android:layout_height="@dimen/holder_list_item_block_size"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/holder_list_item_margin"
+        android:visibility="invisible"/>
+
+    <ImageView
+        android:id="@+id/holder_list_item_image"
+        android:layout_width="@dimen/holder_list_item_block_size"
+        android:layout_height="@dimen/holder_list_item_block_size"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/holder_list_item_margin"
+        android:src="@drawable/item_is_not_loaded"/>
+
+</RelativeLayout>
