@@ -1,16 +1,15 @@
 package com.muravyovdmitr.loadinglist.adapters.holders;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.muravyovdmitr.loadinglist.R;
+import com.muravyovdmitr.loadinglist.adapters.OnSimpleItemLongClick;
 import com.muravyovdmitr.loadinglist.data.SimpleItem;
 
 /**
@@ -23,6 +22,7 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
 
     private Context mContext;
     private SimpleItem mItem;
+    private OnSimpleItemLongClick mOnSimpleItemLongClick;
 
     private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -32,10 +32,25 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
         }
     };
 
+    private final View.OnLongClickListener mOnLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            itemView.setSelected(!itemView.isSelected());
+
+            changeBackgroundAccordingToSelection(itemView.isSelected());
+
+            if (mOnSimpleItemLongClick != null) {
+                mOnSimpleItemLongClick.OnLongClick(getAdapterPosition(), itemView.isSelected());
+            }
+
+            return true;
+        }
+    };
+
     public SimpleItemsListViewHolder(View itemView) {
         super(itemView);
-
         itemView.setOnClickListener(mOnClickListener);
+        itemView.setOnLongClickListener(mOnLongClickListener);
 
         mContext = itemView.getContext();
 
@@ -44,9 +59,11 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
         mItemImage = (ImageView) itemView.findViewById(R.id.holder_list_item_image);
     }
 
-    public void bind(SimpleItem item) {
+    public void bind(SimpleItem item, boolean isSelected) {
+        itemView.setSelected(isSelected);
+        changeBackgroundAccordingToSelection(isSelected);
+
         mItem = item;
-        itemView.setActivated(true);
 
         mItemTitle.setText(mItem.getTittle());
         changeItemStatusImage(mItem.isLoad());
@@ -63,5 +80,17 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
 
         mItemProgress.setVisibility(View.INVISIBLE);
         mItemImage.setVisibility(View.VISIBLE);
+    }
+
+    public void setOnSimpleItemLongClick(OnSimpleItemLongClick onSimpleItemLongClick){
+        mOnSimpleItemLongClick = onSimpleItemLongClick;
+    }
+
+    private void changeBackgroundAccordingToSelection(boolean isSelected){
+        if(isSelected){
+            itemView.setBackgroundResource(R.color.holder_list_item_background_selected);
+        } else {
+            itemView.setBackgroundResource(R.color.holder_list_item_background);
+        }
     }
 }

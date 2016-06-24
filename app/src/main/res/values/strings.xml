@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">LoadingList</string>
     <string name="menu_items_list_load">Load Items</string>
+    <string name="menu_items_list_release">Release selected items</string>
 </resources>

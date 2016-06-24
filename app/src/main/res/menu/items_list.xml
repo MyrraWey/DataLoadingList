@@ -4,6 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_items_list_release"
+        android:icon="@drawable/release_selectet_items"
+        android:title="@string/menu_items_list_release"
+        android:visible="false"
+        app:showAsAction="ifRoom|withText"/>
+
+    <item
         android:id="@+id/menu_items_list_load"
         android:icon="@drawable/load_data"
         android:title="@string/menu_items_list_load"

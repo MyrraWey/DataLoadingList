@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="holder_list_item_background">#e0e0e0</color>
+    <color name="holder_list_item_background_selected">#109090</color>
 </resources>
