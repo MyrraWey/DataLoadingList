@@ -18,12 +18,14 @@ import java.util.List;
 public class SimpleItemsListAdapter extends RecyclerView.Adapter<SimpleItemsListViewHolder> {
     private List<SimpleItem> mItems;
     private SparseBooleanArray mSelectedItems;
+    private SparseBooleanArray mLoadingItems;
     private InvalidateMenuFromAdapter mInvalidateMenuFromAdapter;
 
     public SimpleItemsListAdapter(List<SimpleItem> items) {
         mItems = items;
 
         mSelectedItems = new SparseBooleanArray();
+        mLoadingItems = new SparseBooleanArray();
     }
 
     private final OnSimpleItemLongClick mOnSimpleItemLongClick = new OnSimpleItemLongClick() {
@@ -56,6 +58,10 @@ public class SimpleItemsListAdapter extends RecyclerView.Adapter<SimpleItemsList
     public void onBindViewHolder(SimpleItemsListViewHolder holder, int position) {
         boolean isItemSelected = mSelectedItems.get(position, false);
         holder.bind(mItems.get(position), isItemSelected);
+        if(mLoadingItems.get(position, false)){
+            holder.loadItem();
+            mLoadingItems.delete(position);
+        }
     }
 
     @Override
@@ -71,31 +77,40 @@ public class SimpleItemsListAdapter extends RecyclerView.Adapter<SimpleItemsList
         return mSelectedItems.size() > 0;
     }
 
-    public int[] getSelectedItemsPositions(){
+    public int[] getSelectedItemsPositions() {
         int[] positions = new int[mSelectedItems.size()];
 
-        for(int i=0;i<mSelectedItems.size();i++){
+        for (int i = 0; i < mSelectedItems.size(); i++) {
             positions[i] = mSelectedItems.keyAt(i);
         }
 
         return positions;
     }
 
-    public void selectAll(){
+    public void selectAll() {
         mSelectedItems = new SparseBooleanArray(mItems.size());
-        for(int i=0;i<mItems.size();i++){
+        for (int i = 0; i < mItems.size(); i++) {
             mSelectedItems.put(i, true);
         }
 
         notifyItemRangeChanged(0, mSelectedItems.size());
     }
 
-    public void clearSelection(){
+    public void loadItems() {
+        mLoadingItems = mSelectedItems;
+        clearSelection();
+
+        for (int i = 0; i < mLoadingItems.size(); i++) {
+            notifyItemChanged(mLoadingItems.keyAt(i));
+        }
+    }
+
+    public void clearSelection() {
         int[] selectedPositions = getSelectedItemsPositions();
 
         mSelectedItems = new SparseBooleanArray();
 
-        for(int i : selectedPositions){
+        for (int i : selectedPositions) {
             notifyItemChanged(i);
         }
     }

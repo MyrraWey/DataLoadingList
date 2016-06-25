@@ -1,5 +1,6 @@
 package com.muravyovdmitr.loadinglist.ui.activities;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog.Builder;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import com.muravyovdmitr.loadinglist.data.SimpleItem;
 import com.muravyovdmitr.loadinglist.data.SimpleItemsManager;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ItemsList extends AppCompatActivity {
     RecyclerView mRecyclerView;
@@ -97,8 +99,17 @@ public class ItemsList extends AppCompatActivity {
         String format = "Do you really want to update all selected items (%d)?";
 
         return new Builder(this).setTitle("Update items")
-                .setMessage(String.format(format, mItemsListAdapter.getSelectedItemsPositions().length))
-                .setPositiveButton(android.R.string.ok, null)
+                .setMessage(String.format(
+                        Locale.getDefault(),
+                        format,
+                        mItemsListAdapter.getSelectedItemsPositions().length
+                ))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mItemsListAdapter.loadItems();
+                    }
+                })
                 .setNegativeButton(android.R.string.cancel, null);
     }
 }

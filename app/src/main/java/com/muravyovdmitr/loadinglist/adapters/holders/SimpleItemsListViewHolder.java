@@ -1,8 +1,10 @@
 package com.muravyovdmitr.loadinglist.adapters.holders;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -91,6 +93,61 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
             itemView.setBackgroundResource(R.color.holder_list_item_background_selected);
         } else {
             itemView.setBackgroundResource(R.color.holder_list_item_background);
+        }
+    }
+
+    public void loadItem(){
+        LoadItem loadItem = new LoadItem(mItem.getLoadingTime());
+        loadItem.execute();
+    }
+
+    private class LoadItem extends AsyncTask<Void, Integer, Void> {
+        private int mLoadingTime;
+
+        public LoadItem(int loadTime){
+            mLoadingTime = loadTime;
+
+            mItemProgress.setMax(loadTime);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            mItemImage.setVisibility(View.INVISIBLE);
+            mItemProgress.setVisibility(View.VISIBLE);
+            mItemProgress.setProgress(0);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            int currentLoadingTime = 0;
+            while (currentLoadingTime++ < mLoadingTime){
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                publishProgress(currentLoadingTime);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+
+            mItemProgress.setProgress(values[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            mItem.setLoad(true);
+            changeItemStatusImage(true);
         }
     }
 }
