@@ -81,6 +81,15 @@ public class SimpleItemsListAdapter extends RecyclerView.Adapter<SimpleItemsList
         return positions;
     }
 
+    public void selectAll(){
+        mSelectedItems = new SparseBooleanArray(mItems.size());
+        for(int i=0;i<mItems.size();i++){
+            mSelectedItems.put(i, true);
+        }
+
+        notifyItemRangeChanged(0, mSelectedItems.size());
+    }
+
     public void clearSelection(){
         int[] selectedPositions = getSelectedItemsPositions();
 

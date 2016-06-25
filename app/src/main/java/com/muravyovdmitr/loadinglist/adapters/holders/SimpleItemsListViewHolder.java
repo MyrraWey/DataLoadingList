@@ -27,14 +27,6 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
     private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            mItem.setLoad(!mItem.isLoad());
-            changeItemStatusImage(mItem.isLoad());
-        }
-    };
-
-    private final View.OnLongClickListener mOnLongClickListener = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
             itemView.setSelected(!itemView.isSelected());
 
             changeBackgroundAccordingToSelection(itemView.isSelected());
@@ -42,6 +34,14 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
             if (mOnSimpleItemLongClick != null) {
                 mOnSimpleItemLongClick.OnLongClick(getAdapterPosition(), itemView.isSelected());
             }
+        }
+    };
+
+    private final View.OnLongClickListener mOnLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            mItem.setLoad(!mItem.isLoad());
+            changeItemStatusImage(mItem.isLoad());
 
             return true;
         }

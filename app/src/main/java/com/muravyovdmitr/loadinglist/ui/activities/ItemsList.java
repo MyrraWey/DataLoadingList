@@ -53,13 +53,17 @@ public class ItemsList extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_items_list_load:
-                Builder dialog = mItemsListAdapter.isAnyItemSelected() ? getDataLoadingDialog()
-                        : getNegativeDataLoadingDialog();
+                Builder dialog = getDataLoadingDialog();
                 dialog.show();
                 return true;
             case R.id.menu_items_list_release:
+            case R.id.menu_items_list_deselect_all:
                 mItemsListAdapter.clearSelection();
-                item.setVisible(false);
+                invalidateOptionsMenu();
+                return true;
+            case R.id.menu_items_list_select_all:
+                mItemsListAdapter.selectAll();
+                invalidateOptionsMenu();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -70,7 +74,9 @@ public class ItemsList extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        menu.findItem(R.id.menu_items_list_release).setVisible(mItemsListAdapter.isAnyItemSelected());
+        boolean isAnyItemsSelected = mItemsListAdapter.isAnyItemSelected();
+        menu.findItem(R.id.menu_items_list_release).setVisible(isAnyItemsSelected);
+        menu.findItem(R.id.menu_items_list_load).setVisible(isAnyItemsSelected);
 
         return true;
     }
@@ -87,20 +93,12 @@ public class ItemsList extends AppCompatActivity {
         mRecyclerView.setAdapter(mItemsListAdapter);
     }
 
-    private Builder getNegativeDataLoadingDialog() {
-        return new Builder(this).setTitle("Any selected items")
-                .setMessage("Select items before updating updating")
-                .setPositiveButton(android.R.string.ok, null);
-    }
-
     private Builder getDataLoadingDialog() {
-        String text = "Items to update: ";
-        for (int i : mItemsListAdapter.getSelectedItemsPositions()) {
-            text += i;
-        }
+        String format = "Do you really want to update all selected items (%d)?";
 
         return new Builder(this).setTitle("Update items")
-                .setMessage(text)
-                .setPositiveButton(android.R.string.ok, null);
+                .setMessage(String.format(format, mItemsListAdapter.getSelectedItemsPositions().length))
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(android.R.string.cancel, null);
     }
 }
