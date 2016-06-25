@@ -3,7 +3,7 @@ package com.muravyovdmitr.loadinglist.data;
 /**
  * Created by Dima Muravyov on 23.06.2016.
  */
-public class SimpleItem {
+public class Item {
     private String mTittle;
     private int mLoadingTime;
     private boolean mIsLoad;

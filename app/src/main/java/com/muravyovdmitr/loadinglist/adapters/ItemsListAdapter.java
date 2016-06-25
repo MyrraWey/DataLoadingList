@@ -7,28 +7,28 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.muravyovdmitr.loadinglist.R;
-import com.muravyovdmitr.loadinglist.adapters.holders.SimpleItemsListViewHolder;
-import com.muravyovdmitr.loadinglist.data.SimpleItem;
+import com.muravyovdmitr.loadinglist.adapters.holders.ItemsListViewHolder;
+import com.muravyovdmitr.loadinglist.data.Item;
 
 import java.util.List;
 
 /**
  * Created by Dima Muravyov on 23.06.2016.
  */
-public class SimpleItemsListAdapter extends RecyclerView.Adapter<SimpleItemsListViewHolder> {
-    private List<SimpleItem> mItems;
+public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> {
+    private List<Item> mItems;
     private SparseBooleanArray mSelectedItems;
     private SparseBooleanArray mLoadingItems;
-    private InvalidateMenuFromAdapter mInvalidateMenuFromAdapter;
+    private MenuInvalidator mMenuInvalidator;
 
-    public SimpleItemsListAdapter(List<SimpleItem> items) {
+    public ItemsListAdapter(List<Item> items) {
         mItems = items;
 
         mSelectedItems = new SparseBooleanArray();
         mLoadingItems = new SparseBooleanArray();
     }
 
-    private final OnSimpleItemLongClick mOnSimpleItemLongClick = new OnSimpleItemLongClick() {
+    private final ItemLongClickListener mItemLongClickListener = new ItemLongClickListener() {
         @Override
         public void OnLongClick(int position, boolean isSelected) {
             if (isSelected) {
@@ -37,28 +37,28 @@ public class SimpleItemsListAdapter extends RecyclerView.Adapter<SimpleItemsList
                 mSelectedItems.delete(position);
             }
 
-            if (mInvalidateMenuFromAdapter != null) {
-                mInvalidateMenuFromAdapter.invalidateMenu();
+            if (mMenuInvalidator != null) {
+                mMenuInvalidator.invalidateMenu();
             }
         }
     };
 
     @Override
-    public SimpleItemsListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ItemsListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.holder_list_item, parent, false);
 
-        SimpleItemsListViewHolder simpleItemsListViewHolder = new SimpleItemsListViewHolder(view);
-        simpleItemsListViewHolder.setOnSimpleItemLongClick(mOnSimpleItemLongClick);
+        ItemsListViewHolder itemsListViewHolder = new ItemsListViewHolder(view);
+        itemsListViewHolder.setItemLongClickListener(mItemLongClickListener);
 
-        return simpleItemsListViewHolder;
+        return itemsListViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(SimpleItemsListViewHolder holder, int position) {
+    public void onBindViewHolder(ItemsListViewHolder holder, int position) {
         boolean isItemSelected = mSelectedItems.get(position, false);
         holder.bind(mItems.get(position), isItemSelected);
-        if(mLoadingItems.get(position, false)){
+        if (mLoadingItems.get(position, false)) {
             holder.loadItem();
             mLoadingItems.delete(position);
         }
@@ -69,8 +69,8 @@ public class SimpleItemsListAdapter extends RecyclerView.Adapter<SimpleItemsList
         return mItems.size();
     }
 
-    public void setInvalidateMenuFromAdapter(InvalidateMenuFromAdapter invalidateMenuFromAdapter) {
-        mInvalidateMenuFromAdapter = invalidateMenuFromAdapter;
+    public void setMenuInvalidator(MenuInvalidator menuInvalidator) {
+        mMenuInvalidator = menuInvalidator;
     }
 
     public boolean isAnyItemSelected() {

@@ -4,27 +4,26 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.muravyovdmitr.loadinglist.R;
-import com.muravyovdmitr.loadinglist.adapters.OnSimpleItemLongClick;
-import com.muravyovdmitr.loadinglist.data.SimpleItem;
+import com.muravyovdmitr.loadinglist.adapters.ItemLongClickListener;
+import com.muravyovdmitr.loadinglist.data.Item;
 
 /**
  * Created by Dima Muravyov on 23.06.2016.
  */
-public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
+public class ItemsListViewHolder extends RecyclerView.ViewHolder {
     private TextView mItemTitle;
     private ProgressBar mItemProgress;
     private ImageView mItemImage;
 
     private Context mContext;
-    private SimpleItem mItem;
-    private OnSimpleItemLongClick mOnSimpleItemLongClick;
+    private Item mItem;
+    private ItemLongClickListener mItemLongClickListener;
 
     private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -33,8 +32,8 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
 
             changeBackgroundAccordingToSelection(itemView.isSelected());
 
-            if (mOnSimpleItemLongClick != null) {
-                mOnSimpleItemLongClick.OnLongClick(getAdapterPosition(), itemView.isSelected());
+            if (mItemLongClickListener != null) {
+                mItemLongClickListener.OnLongClick(getAdapterPosition(), itemView.isSelected());
             }
         }
     };
@@ -49,7 +48,7 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
         }
     };
 
-    public SimpleItemsListViewHolder(View itemView) {
+    public ItemsListViewHolder(View itemView) {
         super(itemView);
         itemView.setOnClickListener(mOnClickListener);
         itemView.setOnLongClickListener(mOnLongClickListener);
@@ -61,7 +60,7 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
         mItemImage = (ImageView) itemView.findViewById(R.id.holder_list_item_image);
     }
 
-    public void bind(SimpleItem item, boolean isSelected) {
+    public void bind(Item item, boolean isSelected) {
         itemView.setSelected(isSelected);
         changeBackgroundAccordingToSelection(isSelected);
 
@@ -84,19 +83,19 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
         mItemImage.setVisibility(View.VISIBLE);
     }
 
-    public void setOnSimpleItemLongClick(OnSimpleItemLongClick onSimpleItemLongClick){
-        mOnSimpleItemLongClick = onSimpleItemLongClick;
+    public void setItemLongClickListener(ItemLongClickListener itemLongClickListener) {
+        mItemLongClickListener = itemLongClickListener;
     }
 
-    private void changeBackgroundAccordingToSelection(boolean isSelected){
-        if(isSelected){
+    private void changeBackgroundAccordingToSelection(boolean isSelected) {
+        if (isSelected) {
             itemView.setBackgroundResource(R.color.holder_list_item_background_selected);
         } else {
             itemView.setBackgroundResource(R.color.holder_list_item_background);
         }
     }
 
-    public void loadItem(){
+    public void loadItem() {
         LoadItem loadItem = new LoadItem(mItem.getLoadingTime());
         loadItem.execute();
     }
@@ -104,7 +103,7 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
     private class LoadItem extends AsyncTask<Void, Integer, Void> {
         private int mLoadingTime;
 
-        public LoadItem(int loadTime){
+        public LoadItem(int loadTime) {
             mLoadingTime = loadTime;
 
             mItemProgress.setMax(loadTime);
@@ -122,7 +121,7 @@ public class SimpleItemsListViewHolder extends RecyclerView.ViewHolder {
         @Override
         protected Void doInBackground(Void... params) {
             int currentLoadingTime = 0;
-            while (currentLoadingTime++ < mLoadingTime){
+            while (currentLoadingTime++ < mLoadingTime) {
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {

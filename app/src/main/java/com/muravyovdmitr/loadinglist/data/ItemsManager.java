@@ -7,15 +7,15 @@ import java.util.Random;
 /**
  * Created by Dima Muravyov on 23.06.2016.
  */
-public class SimpleItemsManager {
-    public List<SimpleItem> mItems;
+public class ItemsManager {
+    public List<Item> mItems;
 
-    public SimpleItemsManager() {
+    public ItemsManager() {
         Random random = new Random();
         mItems = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            SimpleItem item = new SimpleItem();
+            Item item = new Item();
             item.setTittle("Item #" + i);
             item.setLoad(false);
             item.setLoadingTime(1000 + random.nextInt(4000));
@@ -24,7 +24,7 @@ public class SimpleItemsManager {
         }
     }
 
-    public List<SimpleItem> getItems() {
+    public List<Item> getItems() {
         return mItems;
     }
 }

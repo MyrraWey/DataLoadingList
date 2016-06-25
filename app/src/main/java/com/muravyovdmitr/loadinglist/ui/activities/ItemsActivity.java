@@ -10,23 +10,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.muravyovdmitr.loadinglist.R;
-import com.muravyovdmitr.loadinglist.adapters.InvalidateMenuFromAdapter;
-import com.muravyovdmitr.loadinglist.adapters.SimpleItemsListAdapter;
-import com.muravyovdmitr.loadinglist.adapters.decorations.SimpeItemsListDecoration;
-import com.muravyovdmitr.loadinglist.data.SimpleItem;
-import com.muravyovdmitr.loadinglist.data.SimpleItemsManager;
+import com.muravyovdmitr.loadinglist.adapters.ItemsListAdapter;
+import com.muravyovdmitr.loadinglist.adapters.MenuInvalidator;
+import com.muravyovdmitr.loadinglist.adapters.decorations.ItemsListDecoration;
+import com.muravyovdmitr.loadinglist.data.Item;
+import com.muravyovdmitr.loadinglist.data.ItemsManager;
 
 import java.util.List;
 import java.util.Locale;
 
-public class ItemsList extends AppCompatActivity {
+public class ItemsActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
 
-    private SimpleItemsManager mItemsManager;
-    private List<SimpleItem> mItems;
-    private SimpleItemsListAdapter mItemsListAdapter;
+    private ItemsManager mItemsManager;
+    private List<Item> mItems;
+    private ItemsListAdapter mItemsListAdapter;
 
-    private final InvalidateMenuFromAdapter mInvalidateMenuFromAdapter = new InvalidateMenuFromAdapter() {
+    private final MenuInvalidator mMenuInvalidator = new MenuInvalidator() {
         @Override
         public void invalidateMenu() {
             invalidateOptionsMenu();
@@ -84,14 +84,14 @@ public class ItemsList extends AppCompatActivity {
     }
 
     private void initData() {
-        mItemsManager = new SimpleItemsManager();
+        mItemsManager = new ItemsManager();
         mItems = mItemsManager.getItems();
-        mItemsListAdapter = new SimpleItemsListAdapter(mItems);
-        mItemsListAdapter.setInvalidateMenuFromAdapter(mInvalidateMenuFromAdapter);
+        mItemsListAdapter = new ItemsListAdapter(mItems);
+        mItemsListAdapter.setMenuInvalidator(mMenuInvalidator);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.addItemDecoration(new SimpeItemsListDecoration());
+        mRecyclerView.addItemDecoration(new ItemsListDecoration());
         mRecyclerView.setAdapter(mItemsListAdapter);
     }
 
