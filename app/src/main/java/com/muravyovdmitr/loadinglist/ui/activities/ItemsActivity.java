@@ -107,7 +107,7 @@ public class ItemsActivity extends AppCompatActivity {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mItemsListAdapter.loadItems();
+                        mItemsListAdapter.startLoadingSelectedItems();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null);
