@@ -86,7 +86,7 @@ public class ItemsActivity extends AppCompatActivity {
     private void initData() {
         mItemsManager = new ItemsManager();
         mItems = mItemsManager.getItems();
-        mItemsListAdapter = new ItemsListAdapter(mItems);
+        mItemsListAdapter = new ItemsListAdapter(mItems, this);
         mItemsListAdapter.setMenuInvalidator(mMenuInvalidator);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

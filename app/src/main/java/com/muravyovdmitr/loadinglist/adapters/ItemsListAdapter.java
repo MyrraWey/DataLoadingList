@@ -1,5 +1,7 @@
 package com.muravyovdmitr.loadinglist.adapters;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
@@ -28,12 +30,14 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
     private SparseBooleanArray mSelectedItems;
     private SparseBooleanArray mLoadingItems;
     private MenuInvalidator mMenuInvalidator;
+    private Context context;
 
-    public ItemsListAdapter(List<Item> items) {
+    public ItemsListAdapter(List<Item> items, Context context) {
         mItems = items;
 
         mSelectedItems = new SparseBooleanArray();
         mLoadingItems = new SparseBooleanArray();
+        this.context = context;
     }
 
     private final ItemLongClickListener mItemLongClickListener = new ItemLongClickListener() {
@@ -74,7 +78,7 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
                     notifyItemChanged(itemPosition);
                     return true;
                 case RELOAD_ITEM:
-                    ItemsListAdapter.this.getReloadDialog(itemPosition).show();
+                    ItemsListAdapter.this.getReloadDialog(itemPosition, context).show();
                     return true;
                 default:
                     return false;
@@ -88,7 +92,6 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
         holder.bind(mItems.get(position), isItemSelected);
         if (mLoadingItems.get(position, false)) {
             holder.loadItem();
-            mLoadingItems.delete(position);
         }
     }
 
@@ -144,11 +147,15 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
     }
 
     private void loadItem(final int itemPosition) {
+        loadItem(itemPosition, false);
+    }
+
+    private void loadItem(final int itemPosition, final boolean reload) {
         (new Thread(new Runnable() {
             @Override
             public void run() {
                 Item item = mItems.get(itemPosition);
-                if (item.isLoad()) {
+                if (item.isLoad() && !reload) {
                     loadItem.sendMessage(loadItem.obtainMessage(RELOAD_ITEM, itemPosition, 0));
                 } else {
                     try {
@@ -164,14 +171,14 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
         }, "Load Item#" + itemPosition)).start();
     }
 
-    private AlertDialog.Builder getReloadDialog(final int itemPosition) {
-        return new AlertDialog.Builder(LoadingListApplication.getInstance())
+    private AlertDialog.Builder getReloadDialog(final int itemPosition, Context context) {
+        return new AlertDialog.Builder(context)
                 .setTitle("Item already loaded")
                 .setMessage("Do you want to reload item #" + itemPosition)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        loadItem(itemPosition);
+                        loadItem(itemPosition, true);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
