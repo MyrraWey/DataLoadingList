@@ -24,6 +24,7 @@ public class ItemsListViewHolder extends RecyclerView.ViewHolder {
     private Context mContext;
     private Item mItem;
     private ItemLongClickListener mItemLongClickListener;
+    private boolean isLoading;
 
     private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -41,6 +42,10 @@ public class ItemsListViewHolder extends RecyclerView.ViewHolder {
     private final View.OnLongClickListener mOnLongClickListener = new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
+            if(isLoading){
+                return true;
+            }
+
             mItem.setLoad(!mItem.isLoad());
             changeItemStatusImage(mItem.isLoad());
 
@@ -71,6 +76,7 @@ public class ItemsListViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void changeItemStatusImage(boolean isLoad) {
+        isLoading = false;
         int imageId = isLoad ? R.drawable.item_is_loaded : R.drawable.item_is_not_loaded;
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -96,6 +102,7 @@ public class ItemsListViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void loadItem() {
+        isLoading = true;
         mItemProgress.setIndeterminate(true);
         mItemProgress.setVisibility(View.VISIBLE);
         mItemImage.setVisibility(View.INVISIBLE);

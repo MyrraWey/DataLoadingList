@@ -1,6 +1,5 @@
 package com.muravyovdmitr.loadinglist.adapters;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
@@ -15,7 +14,6 @@ import android.view.ViewGroup;
 import com.muravyovdmitr.loadinglist.R;
 import com.muravyovdmitr.loadinglist.adapters.holders.ItemsListViewHolder;
 import com.muravyovdmitr.loadinglist.data.Item;
-import com.muravyovdmitr.loadinglist.utils.LoadingListApplication;
 
 import java.util.List;
 
@@ -23,6 +21,7 @@ import java.util.List;
  * Created by Dima Muravyov on 23.06.2016.
  */
 public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> {
+    private static final int START_LOADING = 0;
     private static final int ITEM_UPDATED = 1;
     private static final int RELOAD_ITEM = 2;
 
@@ -43,6 +42,10 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
     private final ItemLongClickListener mItemLongClickListener = new ItemLongClickListener() {
         @Override
         public void OnLongClick(int position, boolean isSelected) {
+            if (mLoadingItems.get(position, false)) {
+                return;
+            }
+
             if (isSelected) {
                 mSelectedItems.append(position, isSelected);
             } else {
@@ -72,13 +75,17 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
             int itemPosition = msg.arg1;
 
             switch (msg.what) {
+                case START_LOADING:
+                    mLoadingItems.put(itemPosition, true);
+                    notifyItemChanged(itemPosition);
+                    return true;
                 case ITEM_UPDATED:
                     mItems.get(itemPosition).setLoad(true);
                     mLoadingItems.delete(itemPosition);
                     notifyItemChanged(itemPosition);
                     return true;
                 case RELOAD_ITEM:
-                    ItemsListAdapter.this.getReloadDialog(itemPosition, context).show();
+                    getReloadDialog(itemPosition, context).show();
                     return true;
                 default:
                     return false;
@@ -128,12 +135,11 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
     }
 
     public void startLoadingSelectedItems() {
-        mLoadingItems = mSelectedItems;
-        clearSelection();
-
-        for (int i = 0; i < mLoadingItems.size(); i++) {
-            loadItem(mLoadingItems.keyAt(i));
+        for (int i = 0; i < mSelectedItems.size(); i++) {
+            loadItem(mSelectedItems.keyAt(i));
         }
+
+        clearSelection();
     }
 
     public void clearSelection() {
@@ -144,6 +150,8 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
         for (int i : selectedPositions) {
             notifyItemChanged(i);
         }
+
+        mMenuInvalidator.invalidateMenu();
     }
 
     private void loadItem(final int itemPosition) {
@@ -158,17 +166,18 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
                 if (item.isLoad() && !reload) {
                     loadItem.sendMessage(loadItem.obtainMessage(RELOAD_ITEM, itemPosition, 0));
                 } else {
+                    loadItem.sendMessage(loadItem.obtainMessage(START_LOADING, itemPosition, 0));
+
                     try {
                         Thread.sleep(item.getLoadingTime());
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
-
                     loadItem.sendMessage(loadItem.obtainMessage(ITEM_UPDATED, itemPosition, 0));
                 }
             }
-        }, "Load Item#" + itemPosition)).start();
+        })).start();
     }
 
     private AlertDialog.Builder getReloadDialog(final int itemPosition, Context context) {
@@ -188,5 +197,12 @@ public class ItemsListAdapter extends RecyclerView.Adapter<ItemsListViewHolder> 
                         notifyItemChanged(itemPosition);
                     }
                 });
+    }
+
+    private AlertDialog.Builder getAlreadyLoadingDialog(final int itemPosition, Context context) {
+        return new AlertDialog.Builder(context)
+                .setTitle("Item already loading")
+                .setMessage("Item #" + itemPosition + " already loading.")
+                .setPositiveButton(android.R.string.ok, null);
     }
 }
